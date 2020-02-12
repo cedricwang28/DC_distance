@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DC Distance</title>
+
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        main {
+            width: 96%;
+            height: auto;
+            box-sizing: border-box;
+            margin: 0 auto;
+        }
+
+        .map {
+            width: 800px;
+            height: auto;
+            position: relative;
+            float: left;
+        }
+
+        img {
+            width: 100%;
+        }
+
+        .point {
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            text-align: center;
+            font-size: 24px;
+            line-height: 25px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+        }
+        .point:hover{
+            transform: scale(1.1);
+            cursor: pointer;
+        }
+
+        .main {
+            background-color: yellow;
+            left: 310px;
+            top: 170px;
+            color: black;
+        }
+
+        .green {
+            background-color: yellow;
+            right: 100px;
+            top: 80px;
+            color: black;
+        }
+
+        .gym {
+            background-color: yellow;
+            left: 35px;
+            top: 130px;
+            color: black;
+        }
+
+        .sw {
+            background-color: yellow;
+            left: 375px;
+            bottom: 120px;
+            color: black;
+        }
+
+        .desc {
+            float: left;
+            width: 400px;
+        }
+
+        h4 {
+            text-align: center;
+        }
+        h3{
+            color: red;
+            text-align: center;
+            
+           
+        }
+        .distance{
+            height: 300px;
+            box-sizing: border-box;
+            border: 1px grey solid;
+        }
+        .para{
+            text-align: center;
+            font-family: roboto;
+            font-size: 18px;
+            color:cornflowerblue;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Show Distance Between Points</h1>
+    <main>
+        <div class="map">
+            <img src="./map.png" alt="">
+            <div class="point main" name="Main_Building">A</div>
+            <div class="point green" name="Green_Building">B</div>
+            <div class="point gym" name="Gym">C</div>
+            <div class="point sw" name="South_Wing">D</div>
+        </div>
+        <div class="desc">
+            <div>
+                <h4>A -- Main Building Entrance</h4>
+                <h4>B -- Green-top Building Entrance</h4>
+                <h4>C -- Gym Entrance</h4>
+                <h4>D -- South Wing Entrance</h4>
+            </div>
+            <div class="distance">
+                <h3>Click any point to get distance</h3>
+                <p class="para p1"></p>
+                <p class="para p2"></p>
+                <p class="para p3"></p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+    <script>
+
+        $('.point').click(function(){
+
+            let [lng,lat] = [0,0];
+
+            let name = $(this).attr('name');
+
+            fetch(`/api/point/${name}`).then(data=>data.json()).then((data)=>{
+               
+                lng = data[0].geometry.coordinates[0];
+                lat = data[0].geometry.coordinates[1];
+                console.log(lng,lat);
+            });
+
+            setTimeout(()=>{
+                fetch(`/api/point?lng=${lng}&lat=${lat}`).then((data)=>{
+                    return data.json();
+                }).then((data)=>{
+                    console.log(data[1].dist.calculated);
+
+                    $('.p1').html(`${name} to ${data[1].name} distance: ${data[1].dist.calculated.toFixed(0)} m`);
+                    $('.p2').html(`${name} to ${data[2].name} distance: ${data[2].dist.calculated.toFixed(0)} m`);
+                    $('.p3').html(`${name} to ${data[3].name} distance: ${data[3].dist.calculated.toFixed(0)} m`);
+                });
+            },1000);
+
+            
+        });
+    </script>
+</body>
+
+</html>
